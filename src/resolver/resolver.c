@@ -18,22 +18,5 @@
  * @APPLE_APACHE_LICENSE_HEADER_END@
  */
 
-#ifndef __PTHREAD_RESOLVER_H__
-#define __PTHREAD_RESOLVER_H__
 
-#include "resolver_internal.h"
-
-#ifdef OS_VARIANT_SELECTOR
-
-#if TARGET_OS_EMBEDDED
-#define pthread_mutex_lock \
-		OS_VARIANT(pthread_mutex_lock, OS_VARIANT_SELECTOR)
-#define pthread_mutex_trylock \
-		OS_VARIANT(pthread_mutex_trylock, OS_VARIANT_SELECTOR)
-#define pthread_mutex_unlock \
-		OS_VARIANT(pthread_mutex_unlock, OS_VARIANT_SELECTOR)
-#endif // TARGET_OS_EMBEDDED
-
-#endif // OS_VARIANT_SELECTOR
-
-#endif // __PTHREAD_RESOLVER_H__
+struct _os_empty_files_are_not_c_files;

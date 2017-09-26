@@ -18,13 +18,10 @@
  * @APPLE_APACHE_LICENSE_HEADER_END@
  */
 
-#define OS_ATOMIC_UP 1
+#ifndef __PTHREAD_RESOLVER_H__
+#define __PTHREAD_RESOLVER_H__
+
 #include "resolver_internal.h"
 
-#ifdef OS_VARIANT_SELECTOR
-#define OS_UP_VARIANT_ONLY 1
-#include "pthread_mutex.c"
-#endif
 
-struct _os_empty_files_are_not_c_files;
-
+#endif // __PTHREAD_RESOLVER_H__

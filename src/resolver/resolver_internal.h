@@ -21,31 +21,5 @@
 #ifndef __PTHREAD_RESOLVER_INTERNAL_H__
 #define __PTHREAD_RESOLVER_INTERNAL_H__
 
-#include <os/base.h>
-#include <TargetConditionals.h>
-#include <machine/cpu_capabilities.h>
-#if defined(__arm__)
-#include <arm/arch.h>
-#endif
 
-// XXX <rdar://problem/24290376> eOS version of libpthread doesn't have UP optimizations
-#if !defined(VARIANT_STATIC) && \
-     defined(_ARM_ARCH_7) && !defined(__ARM_ARCH_7S__)
-
-#if OS_ATOMIC_UP
-#define OS_VARIANT_SELECTOR up
-#else
-#define OS_VARIANT_SELECTOR mp
-#endif
-
-#endif // !VARIANT_STATIC && _ARM_ARCH_7 && !__ARM_ARCH_7S__
-
-#define OS_VARIANT(f, v) OS_CONCAT(f, OS_CONCAT($VARIANT$, v))
-
-#ifdef OS_VARIANT_SELECTOR
-#define PTHREAD_NOEXPORT_VARIANT  PTHREAD_NOEXPORT
-#else
-#define PTHREAD_NOEXPORT_VARIANT
-#endif
-
-#endif // __PTHREAD_RESOLVER_H__
+#endif // __PTHREAD_RESOLVER_INTERNAL_H__

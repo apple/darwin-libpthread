@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2012 Apple Inc. All rights reserved.
+ * Copyright (c) 2017 Apple Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@
  *
@@ -21,17 +21,15 @@
  * @APPLE_LICENSE_HEADER_END@
  */
 
-#include <TargetConditionals.h>
-#if defined(__i386__)
+#ifndef DARWINTEST_DEFAULTS_H
+#define DARWINTEST_DEFAULTS_H
 
-#define BUILDING_VARIANT 1
+#include <darwintest.h>
 
-#undef __DARWIN_UNIX03
-#define __DARWIN_UNIX03 0
+T_GLOBAL_META (
+    T_META_TIMEOUT(30),
+    T_META_LTEPHASE(LTE_POSTINIT)
+);
 
-#define _pthread_rwlock_lock_slow _pthread_rwlock_lock_legacy_slow
-#define _pthread_rwlock_unlock_slow _pthread_rwlock_unlock_legacy_slow
 
-#include "../pthread_rwlock.c"
-
-#endif
+#endif // DARWINTEST_DEFAULTS_H
