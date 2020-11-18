@@ -56,38 +56,28 @@
 #include <os/tsd.h>
 #include <pthread/spinlock_private.h>
 
-#ifndef __TSD_MACH_THREAD_SELF
-#define __TSD_MACH_THREAD_SELF 3
-#endif
-
-#ifndef __TSD_THREAD_QOS_CLASS
-#define __TSD_THREAD_QOS_CLASS 4
-#endif
-
-#ifndef __TSD_RETURN_TO_KERNEL
-#define __TSD_RETURN_TO_KERNEL 5
-#endif
-
-#ifndef __TSD_PTR_MUNGE
-#define __TSD_PTR_MUNGE 7
-#endif
-
-#ifndef __TSD_MACH_SPECIAL_REPLY
-#define __TSD_MACH_SPECIAL_REPLY 8
-#endif
-
 /* Constant TSD slots for inline pthread_getspecific() usage. */
 
 /* Keys 0 - 9 are for Libsyscall/libplatform usage */
-#define _PTHREAD_TSD_SLOT_PTHREAD_SELF __TSD_THREAD_SELF
-#define _PTHREAD_TSD_SLOT_ERRNO __TSD_ERRNO
-#define _PTHREAD_TSD_SLOT_MIG_REPLY __TSD_MIG_REPLY
-#define _PTHREAD_TSD_SLOT_MACH_THREAD_SELF __TSD_MACH_THREAD_SELF
-#define _PTHREAD_TSD_SLOT_PTHREAD_QOS_CLASS	__TSD_THREAD_QOS_CLASS
-#define _PTHREAD_TSD_SLOT_RETURN_TO_KERNEL __TSD_RETURN_TO_KERNEL
-#define _PTHREAD_TSD_SLOT_PTR_MUNGE __TSD_PTR_MUNGE
-#define _PTHREAD_TSD_SLOT_MACH_SPECIAL_REPLY __TSD_MACH_SPECIAL_REPLY
-//#define _PTHREAD_TSD_SLOT_SEMAPHORE_CACHE __TSD_SEMAPHORE_CACHE
+#define _PTHREAD_TSD_SLOT_PTHREAD_SELF              __TSD_THREAD_SELF
+#define _PTHREAD_TSD_SLOT_ERRNO                     __TSD_ERRNO
+#define _PTHREAD_TSD_SLOT_MIG_REPLY                 __TSD_MIG_REPLY
+#define _PTHREAD_TSD_SLOT_MACH_THREAD_SELF          __TSD_MACH_THREAD_SELF
+#define _PTHREAD_TSD_SLOT_PTHREAD_QOS_CLASS         __TSD_THREAD_QOS_CLASS
+#define _PTHREAD_TSD_SLOT_RETURN_TO_KERNEL          __TSD_RETURN_TO_KERNEL
+#define _PTHREAD_TSD_SLOT_PTR_MUNGE                 __TSD_PTR_MUNGE
+#define _PTHREAD_TSD_SLOT_MACH_SPECIAL_REPLY        __TSD_MACH_SPECIAL_REPLY
+#define _PTHREAD_TSD_SLOT_SEMAPHORE_CACHE           __TSD_SEMAPHORE_CACHE
+
+#define _PTHREAD_TSD_SLOT_PTHREAD_SELF_TYPE         pthread_t
+#define _PTHREAD_TSD_SLOT_ERRNO_TYPE                int *
+#define _PTHREAD_TSD_SLOT_MIG_REPLY_TYPE            mach_port_t
+#define _PTHREAD_TSD_SLOT_MACH_THREAD_SELF_TYPE     mach_port_t
+#define _PTHREAD_TSD_SLOT_PTHREAD_QOS_CLASS_TYPE    pthread_priority_t
+#define _PTHREAD_TSD_SLOT_RETURN_TO_KERNEL_TYPE     uintptr_t
+#define _PTHREAD_TSD_SLOT_PTR_MUNGE_TYPE            uintptr_t
+#define _PTHREAD_TSD_SLOT_MACH_SPECIAL_REPLY_TYPE   mach_port_t
+#define _PTHREAD_TSD_SLOT_SEMAPHORE_CACHE_TYPE      semaphore_t
 
 /*
  * Windows 64-bit ABI bakes %gs relative accesses into its code in the same
@@ -224,6 +214,20 @@
 #define __PTK_FRAMEWORK_SWIFT_KEY7		107
 #define __PTK_FRAMEWORK_SWIFT_KEY8		108
 #define __PTK_FRAMEWORK_SWIFT_KEY9		109
+
+/* Keys 110-115 for libmalloc */
+#define __PTK_LIBMALLOC_KEY0		110
+#define __PTK_LIBMALLOC_KEY1		111
+#define __PTK_LIBMALLOC_KEY2		112
+#define __PTK_LIBMALLOC_KEY3		113
+#define __PTK_LIBMALLOC_KEY4		114
+
+/* Keys 115-120 for libdispatch workgroups */
+#define __PTK_LIBDISPATCH_WORKGROUP_KEY0		115
+#define __PTK_LIBDISPATCH_WORKGROUP_KEY1		116
+#define __PTK_LIBDISPATCH_WORKGROUP_KEY2		117
+#define __PTK_LIBDISPATCH_WORKGROUP_KEY3		118
+#define __PTK_LIBDISPATCH_WORKGROUP_KEY4		119
 
 /* Keys 190 - 194 are for the use of PerfUtils */
 #define __PTK_PERF_UTILS_KEY0		190

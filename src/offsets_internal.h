@@ -24,18 +24,6 @@
 #ifndef _POSIX_PTHREAD_OFFSETS_H
 #define _POSIX_PTHREAD_OFFSETS_H
 
-#ifndef __ASSEMBLER__
-#define check_backward_offset(field, value) \
-		_Static_assert(offsetof(struct _pthread, tsd) + value == \
-				offsetof(struct _pthread, field), #value " is correct")
-#define check_forward_offset(field, value) \
-		_Static_assert(offsetof(struct _pthread, field) == value, \
-				#value " is correct")
-#else
-#define check_backward_offset(field, value)
-#define check_forward_offset(field, value)
-#endif // __ASSEMBLER__
-
 #if defined(__i386__)
 #define _PTHREAD_STRUCT_DIRECT_STACKADDR_OFFSET   140
 #define _PTHREAD_STRUCT_DIRECT_STACKBOTTOM_OFFSET 144
@@ -47,6 +35,18 @@
 #define _PTHREAD_STRUCT_DIRECT_STACKBOTTOM_OFFSET -32
 #endif
 
+#ifndef __ASSEMBLER__
+#include "pthread/private.h" // for other _PTHREAD_STRUCT_DIRECT_*_OFFSET
+
+#define check_backward_offset(field, value) \
+		_Static_assert(offsetof(struct pthread_s, tsd) + value == \
+				offsetof(struct pthread_s, field), #value " is correct")
+#define check_forward_offset(field, value) \
+		_Static_assert(offsetof(struct pthread_s, field) == value, \
+				#value " is correct")
+
+check_forward_offset(tsd, _PTHREAD_STRUCT_DIRECT_TSD_OFFSET);
+check_backward_offset(thread_id, _PTHREAD_STRUCT_DIRECT_THREADID_OFFSET);
 #if defined(__i386__)
 check_forward_offset(stackaddr, _PTHREAD_STRUCT_DIRECT_STACKADDR_OFFSET);
 check_forward_offset(stackbottom, _PTHREAD_STRUCT_DIRECT_STACKBOTTOM_OFFSET);
@@ -54,5 +54,7 @@ check_forward_offset(stackbottom, _PTHREAD_STRUCT_DIRECT_STACKBOTTOM_OFFSET);
 check_backward_offset(stackaddr, _PTHREAD_STRUCT_DIRECT_STACKADDR_OFFSET);
 check_backward_offset(stackbottom, _PTHREAD_STRUCT_DIRECT_STACKBOTTOM_OFFSET);
 #endif
+
+#endif // __ASSEMBLER__
 
 #endif /* _POSIX_PTHREAD_OFFSETS_H */

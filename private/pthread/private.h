@@ -28,20 +28,6 @@
 #include <Availability.h>
 #include <pthread/tsd_private.h>
 
-/* get the thread specific errno value */
-__header_always_inline int
-_pthread_get_errno_direct(void)
-{
-	return *(int*)_pthread_getspecific_direct(_PTHREAD_TSD_SLOT_ERRNO);
-}
-
-/* set the thread specific errno value */
-__header_always_inline void
-_pthread_set_errno_direct(int value)
-{
-	*((int*)_pthread_getspecific_direct(_PTHREAD_TSD_SLOT_ERRNO)) = value;
-}
-
 __API_AVAILABLE(macos(10.9), ios(7.0))
 pthread_t pthread_main_thread_np(void);
 
@@ -105,32 +91,98 @@ int pthread_attr_setcpupercent_np(pthread_attr_t * __restrict, int, unsigned lon
 __API_AVAILABLE(macos(10.15), ios(13.0), tvos(13.0), watchos(6.0))
 int pthread_current_stack_contains_np(const void *, size_t);
 
-#ifdef _os_tsd_get_base
+/*!
+ * @function pthread_self_is_exiting_np
+ *
+ * @abstract
+ * Returns whether the current thread is exiting.
+ *
+ * @discussion
+ * This can be useful for certain introspection tools to know that malloc/free
+ * is called from the TSD destruction codepath.
+ *
+ * @result
+ * 0 if the thread is not exiting
+ * 1 if the thread is exiting
+ */
+__API_AVAILABLE(macos(10.16), ios(14.0), tvos(14.0), watchos(7.0))
+int pthread_self_is_exiting_np(void);
 
 #ifdef __LP64__
-#define _PTHREAD_STRUCT_DIRECT_THREADID_OFFSET -8
+#define _PTHREAD_STRUCT_DIRECT_THREADID_OFFSET   -8
+#define _PTHREAD_STRUCT_DIRECT_TSD_OFFSET       224
 #else
-#define _PTHREAD_STRUCT_DIRECT_THREADID_OFFSET -16
+#define _PTHREAD_STRUCT_DIRECT_THREADID_OFFSET  -16
+#define _PTHREAD_STRUCT_DIRECT_TSD_OFFSET       176
 #endif
 
+#if !TARGET_OS_SIMULATOR
+#if defined(__i386__)
+#define _pthread_direct_tsd_relative_access(type, offset) \
+		(type *)((char *)_pthread_getspecific_direct(_PTHREAD_TSD_SLOT_PTHREAD_SELF) + \
+		_PTHREAD_STRUCT_DIRECT_TSD_OFFSET + _PTHREAD_STRUCT_DIRECT_##offset##_OFFSET)
+#elif defined(OS_GS_RELATIVE)
+#define _pthread_direct_tsd_relative_access(type, offset) \
+		(type OS_GS_RELATIVE *)(_PTHREAD_STRUCT_DIRECT_##offset##_OFFSET)
+#elif defined(_os_tsd_get_base)
+#define _pthread_direct_tsd_relative_access(type, offset)  \
+		(type *)((char *)_os_tsd_get_base() + _PTHREAD_STRUCT_DIRECT_##offset##_OFFSET)
+#else
+#error "unknown configuration"
+#endif
+#endif // !TARGET_OS_SIMULATOR
+
 /* N.B. DO NOT USE UNLESS YOU ARE REBUILT AS PART OF AN OS TRAIN WORLDBUILD */
-__header_always_inline uint64_t
+__header_always_inline __pure2 uint64_t
 _pthread_threadid_self_np_direct(void)
 {
-#ifndef __i386__
-	if (_pthread_has_direct_tsd()) {
-#ifdef OS_GS_RELATIVE
-		return *(uint64_t OS_GS_RELATIVE *)(_PTHREAD_STRUCT_DIRECT_THREADID_OFFSET);
+#ifdef _pthread_direct_tsd_relative_access
+	return *_pthread_direct_tsd_relative_access(uint64_t, THREADID);
 #else
-		return *(uint64_t*)((char *)_os_tsd_get_base() + _PTHREAD_STRUCT_DIRECT_THREADID_OFFSET);
-#endif
-	}
-#endif
 	uint64_t threadid = 0;
 	pthread_threadid_np(NULL, &threadid);
 	return threadid;
+#endif
 }
 
-#endif // _os_tsd_get_base
+__header_always_inline __pure2 pthread_t
+_pthread_self_direct(void)
+{
+#if TARGET_OS_SIMULATOR || defined(__i386__) || defined(__x86_64__)
+	return (pthread_t)_pthread_getspecific_direct(_PTHREAD_TSD_SLOT_PTHREAD_SELF);
+#elif defined(__arm__) || defined(__arm64__)
+	uintptr_t tsd_base = (uintptr_t)_os_tsd_get_base();
+	return (pthread_t)(tsd_base - _PTHREAD_STRUCT_DIRECT_TSD_OFFSET);
+#else
+#error unsupported architecture
+#endif
+}
+
+__header_always_inline __pure2 mach_port_t
+_pthread_mach_thread_self_direct(void)
+{
+	return (mach_port_t)(uintptr_t)
+			_pthread_getspecific_direct(_PTHREAD_TSD_SLOT_MACH_THREAD_SELF);
+}
+
+__header_always_inline int *
+_pthread_errno_address_direct(void)
+{
+	return (int *)_pthread_getspecific_direct(_PTHREAD_TSD_SLOT_ERRNO);
+}
+
+/* get the thread specific errno value */
+__header_always_inline int
+_pthread_get_errno_direct(void)
+{
+	return *_pthread_errno_address_direct();
+}
+
+/* set the thread specific errno value */
+__header_always_inline void
+_pthread_set_errno_direct(int value)
+{
+	*_pthread_errno_address_direct() = value;
+}
 
 #endif // __PTHREAD_PRIVATE_H__

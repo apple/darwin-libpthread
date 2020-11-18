@@ -29,10 +29,7 @@
 #include <sys/event.h>
 #include <Availability.h>
 #include <pthread/pthread.h>
-#include <pthread/qos.h>
-#ifndef _PTHREAD_BUILDING_PTHREAD_
 #include <pthread/qos_private.h>
-#endif
 
 #define PTHREAD_WORKQUEUE_SPI_VERSION 20170201
 

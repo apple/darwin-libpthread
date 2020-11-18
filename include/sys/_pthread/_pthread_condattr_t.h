@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Apple Computer, Inc. All rights reserved.
+ * Copyright (c) 2003-2012 Apple Inc. All rights reserved.
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_START@
  *
@@ -25,26 +25,8 @@
  *
  * @APPLE_OSREFERENCE_LICENSE_HEADER_END@
  */
-
-#ifndef _WORKQUEUE_INTERNAL_H_
-#define _WORKQUEUE_INTERNAL_H_
-
-/* These definitions are shared between the kext and userspace inside the pthread project. Consolidating
- * duplicate definitions that used to exist in both projects, when separate.
- */
-
-// Sometimes something gets passed a bucket number and we need a way to express
-// that it's actually the event manager.  Use the (0)th bucket for that.
-#define WORKQ_THREAD_QOS_MIN        (THREAD_QOS_MAINTENANCE)
-#define WORKQ_THREAD_QOS_MAX        (THREAD_QOS_LAST - 1)
-#define WORKQ_THREAD_QOS_CLEANUP    (THREAD_QOS_LEGACY)
-#define WORKQ_THREAD_QOS_MANAGER    (THREAD_QOS_LAST) // outside of MIN/MAX
-
-#define WORKQ_NUM_QOS_BUCKETS       (WORKQ_THREAD_QOS_MAX)
-#define WORKQ_NUM_BUCKETS           (WORKQ_THREAD_QOS_MAX + 1)
-#define WORKQ_IDX(qos)              ((qos) - 1) // 0 based index
-
-// magical `nkevents` values for _pthread_wqthread
-#define WORKQ_EXIT_THREAD_NKEVENT   (-1)
-
-#endif // _WORKQUEUE_INTERNAL_H_
+#ifndef _PTHREAD_CONDATTR_T
+#define _PTHREAD_CONDATTR_T
+#include <sys/_pthread/_pthread_types.h> /* __darwin_pthread_condattr_t */
+typedef __darwin_pthread_condattr_t pthread_condattr_t;
+#endif /* _PTHREAD_CONDATTR_T */

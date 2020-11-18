@@ -73,7 +73,7 @@ __BEGIN_DECLS
 
 #endif /* (!_POSIX_C_SOURCE && !_XOPEN_SOURCE) || _DARWIN_C_SOURCE */
 
-__API_AVAILABLE(macos(10.11))
+__API_AVAILABLE(macos(10.11)) __API_UNAVAILABLE(ios, tvos, watchos, bridgeos)
 void _pthread_mutex_enable_legacy_mode(void);
 
 /*
